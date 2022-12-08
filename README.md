@@ -6,6 +6,8 @@
 
 因为 [这个project](https://github.com/ddgth/cf2dns) 没支持cloudflare, 这个可以暂时作为替代品
 
+配合crontab可以定时更新优选ip
+
 ## 如何获取cloudflare api, 域名ID等信息
 
 [这里](https://github.com/XIU2/CloudflareSpeedTest/issues/40) 有详细教程，这里不详细展开
@@ -16,5 +18,3 @@
 [XIU2/CloudflareSpeedTest](https://github.com/XIU2/CloudflareSpeedTest)
 
 [CloudFlare优质IP](https://stock.hostmonit.com/CloudFlareYes)
-
-对
