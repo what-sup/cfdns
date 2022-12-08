@@ -55,6 +55,19 @@ def get_by_time(cfips, path):
 			ret = ips[i]
 	return ret
 
+def get_by_speed(cfips, path):
+	ret = ''
+	ippath = '$.info.' + path + "..ip"
+	speedpath = '$.info.' + path + "..speed"
+	ips = jsonpath.jsonpath(cfips, ippath)
+	speeds = jsonpath.jsonpath(cfips, speedpath)
+	tmpspeed = str(speeds[0])
+	for i in range(len(ips)):
+		if tmpspeed < speeds[i]:
+			tmpspeed = speeds[i]
+			ret = ips[i]
+	return ret
+
 
 def put_cf(api, domain, dns, mail, net, ips):
 	ip = get_by_time(ips, net)
