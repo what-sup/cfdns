@@ -11,7 +11,7 @@ urllib3.disable_warnings()
 KEY = "o1zrmHAF"
 TYPE = 'v4' #暂时只支持A记录
 
-MODE = 1 # 1-取最新ip; 2-取速度最快ip; 3-取延迟最低ip
+MODE = 2 # 1-取最新ip; 2-取速度最快ip; 3-取延迟最低ip
 DOMAINS = {
 	"你的cloudflare api": {
 		"你要修改的域名ID1": {
@@ -44,12 +44,12 @@ def get_ip():
         return None
 
 def get_by_time(cfips, path):
-	ret = ''
 	ippath = '$.info.' + path + "..ip"
 	timepath = '$.info.' + path + "..time"
 	ips = jsonpath.jsonpath(cfips, ippath)
 	times = jsonpath.jsonpath(cfips, timepath)
 	tmptime = str(times[0])
+	ret = ips[0]
 	for i in range(len(ips)):
 		if tmptime > times[i]:
 			tmptime = times[i]
@@ -57,25 +57,26 @@ def get_by_time(cfips, path):
 	return ret
 
 def get_by_speed(cfips, path):
-	ret = ''
 	ippath = '$.info.' + path + "..ip"
 	speedpath = '$.info.' + path + "..speed"
 	ips = jsonpath.jsonpath(cfips, ippath)
 	speeds = jsonpath.jsonpath(cfips, speedpath)
 	tmpspeed = int(speeds[0])
+	ret = ips[0]
 	for i in range(len(ips)):
 		if tmpspeed < speeds[i]:
 			tmpspeed = speeds[i]
 			ret = ips[i]
+
 	return ret
 
 def get_by_latency(cfips, path):
-	ret = ''
 	ippath = '$.info.' + path + "..ip"
 	latencypath = '$.info.' + path + "..latency"
 	ips = jsonpath.jsonpath(cfips, ippath)
 	latencys = jsonpath.jsonpath(cfips, latencypath)
 	tmplatency = int(latencys[0])
+	ret = ips[0]
 	for i in range(len(ips)):
 		if tmplatency > latencys[i]:
 			tmplatency = latencys[i]
@@ -107,6 +108,7 @@ def main():
 	if len(DOMAINS) > 0:
 		try:
 			cfips = get_ip()
+			print(cfips)
 			for api, domains in DOMAINS.items():
 				for domain, dnss in domains.items():
 					for dns, mails in dnss.items():
