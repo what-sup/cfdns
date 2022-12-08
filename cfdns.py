@@ -5,12 +5,13 @@ import urllib3
 import traceback
 import jsonpath
 import requests
+import yaml
 urllib3.disable_warnings()
 
 # KEY可以从 https://shop.hostmonit.com 获取，或者使用以下免费授权
 KEY = "o1zrmHAF"
 TYPE = 'v4' #暂时只支持A记录
-
+'''
 MODE = 3 # 1-取最新ip; 2-取速度最快ip; 3-取延迟最低ip
 DOMAINS = {
 	"你的cloudflare api": {
@@ -30,6 +31,15 @@ DOMAINS = {
 		}
 	}
 }
+'''
+
+with open("config.yaml", 'r',encoding='utf-8') as stream:
+    try:
+        config = yaml.load(stream.read(), Loader=yaml.FullLoader)
+        DOMAINS = config['CONFIG']
+        MODE = config['MODE']
+    except Exception as e:
+        print(e)
 
 def get_ip():
     try:
