@@ -61,12 +61,26 @@ def get_by_speed(cfips, path):
 	speedpath = '$.info.' + path + "..speed"
 	ips = jsonpath.jsonpath(cfips, ippath)
 	speeds = jsonpath.jsonpath(cfips, speedpath)
-	tmpspeed = str(speeds[0])
+	tmpspeed = int(speeds[0])
 	for i in range(len(ips)):
 		if tmpspeed < speeds[i]:
 			tmpspeed = speeds[i]
 			ret = ips[i]
 	return ret
+
+def get_by_latency(cfips, path):
+	ret = ''
+	ippath = '$.info.' + path + "..ip"
+	latencypath = '$.info.' + path + "..latency"
+	ips = jsonpath.jsonpath(cfips, ippath)
+	latencys = jsonpath.jsonpath(cfips, latencypath)
+	tmplatency = int(latencys[0])
+	for i in range(len(ips)):
+		if tmplatency > latencys[i]:
+			tmplatency = latencys[i]
+			ret = ips[i]
+	return ret
+
 
 
 def put_cf(api, domain, dns, mail, net, ips):
