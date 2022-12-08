@@ -11,17 +11,17 @@ urllib3.disable_warnings()
 KEY = "o1zrmHAF"
 TYPE = 'v4' #暂时只支持A记录
 
-MODE = 2 # 1-取最新ip; 2-取速度最快ip; 3-取延迟最低ip
+MODE = 3 # 1-取最新ip; 2-取速度最快ip; 3-取延迟最低ip
 DOMAINS = {
 	"你的cloudflare api": {
 		"你要修改的域名ID1": {
-			"你要修改的域名解析记录ID": {
+			"你要修改的域名解析记录ID1": {
 				"你的邮箱": "CM" # 网络类型： 移动-CM; 联通-CU; 电信-CT
 			},
-			"你要修改的域名解析记录ID": {
+			"你要修改的域名解析记录ID2": {
 				"你的邮箱": "CU"
 			},
-			"你要修改的域名解析记录ID": {
+			"你要修改的域名解析记录ID3": {
 				"你的邮箱": "CT"
 			}
 		},
@@ -100,6 +100,7 @@ def put_cf(api, domain, dns, mail, net, ips):
 	}
 	data = '{"content": "'+ ip + '"}'
 	print(ip)
+	print(net)
 	print(url)
 	print(requests.patch(url, headers = head, data = data).content)
 
