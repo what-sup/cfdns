@@ -11,6 +11,7 @@ urllib3.disable_warnings()
 # KEY可以从 https://shop.hostmonit.com 获取，或者使用以下免费授权
 KEY = "o1zrmHAF"
 TYPE = 'v4' #暂时只支持A记录
+
 '''
 MODE = 3 # 1-取最新ip; 2-取速度最快ip; 3-取延迟最低ip
 DOMAINS = {
@@ -56,12 +57,14 @@ def get_ip():
 def get_by_time(cfips, path):
 	ippath = '$.info.' + path + "..ip"
 	timepath = '$.info.' + path + "..time"
+	losspath = '$.info.' + path + "..loss"
 	ips = jsonpath.jsonpath(cfips, ippath)
 	times = jsonpath.jsonpath(cfips, timepath)
+	losses = jsonpath.jsonpath(cfips, losspath)
 	tmptime = str(times[0])
 	ret = ips[0]
 	for i in range(len(ips)):
-		if tmptime > times[i]:
+		if tmptime > times[i] and loss[i] == 0:
 			tmptime = times[i]
 			ret = ips[i]
 	return ret
@@ -69,12 +72,14 @@ def get_by_time(cfips, path):
 def get_by_speed(cfips, path):
 	ippath = '$.info.' + path + "..ip"
 	speedpath = '$.info.' + path + "..speed"
+	losspath = '$.info.' + path + "..loss"
 	ips = jsonpath.jsonpath(cfips, ippath)
 	speeds = jsonpath.jsonpath(cfips, speedpath)
+	losses = jsonpath.jsonpath(cfips, losspath)
 	tmpspeed = int(speeds[0])
 	ret = ips[0]
 	for i in range(len(ips)):
-		if tmpspeed < speeds[i]:
+		if tmpspeed < speeds[i] and loss[i] == 0:
 			tmpspeed = speeds[i]
 			ret = ips[i]
 
@@ -83,12 +88,14 @@ def get_by_speed(cfips, path):
 def get_by_latency(cfips, path):
 	ippath = '$.info.' + path + "..ip"
 	latencypath = '$.info.' + path + "..latency"
+	losspath = '$.info.' + path + "..loss"
 	ips = jsonpath.jsonpath(cfips, ippath)
 	latencys = jsonpath.jsonpath(cfips, latencypath)
+	losses = jsonpath.jsonpath(cfips, losspath)
 	tmplatency = int(latencys[0])
 	ret = ips[0]
 	for i in range(len(ips)):
-		if tmplatency > latencys[i]:
+		if tmplatency > latencys[i] and loss[i] == 0:
 			tmplatency = latencys[i]
 			ret = ips[i]
 	return ret
