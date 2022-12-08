@@ -18,3 +18,8 @@
 [XIU2/CloudflareSpeedTest](https://github.com/XIU2/CloudflareSpeedTest)
 
 [CloudFlare优质IP](https://stock.hostmonit.com/CloudFlareYes)
+
+##快速使用
+使用pip install -r requirements.txt快速安装依赖库
+修改config.yaml
+- MODE:1-取最新ip; 2-取速度最快ip; 3-取延迟最低ip
