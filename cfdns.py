@@ -11,6 +11,7 @@ urllib3.disable_warnings()
 KEY = "o1zrmHAF"
 TYPE = 'v4' #暂时只支持A记录
 
+MODE = 1 # 1-取最新ip; 2-取速度最快ip; 3-取延迟最低ip
 DOMAINS = {
 	"你的cloudflare api": {
 		"你要修改的域名ID1": {
@@ -84,7 +85,12 @@ def get_by_latency(cfips, path):
 
 
 def put_cf(api, domain, dns, mail, net, ips):
-	ip = get_by_time(ips, net)
+	if MODE == 1:
+		ip = get_by_time(ips, net)
+	elif MODE == 2:
+		ip = get_by_speed(ips, net)
+	elif MODE == 3:
+		ip = get_by_latency(ips, net)
 	url = "https://api.cloudflare.com/client/v4/zones/" + domain + "/dns_records/" + dns
 	head = {
 		"Content-Type": "application/json",
