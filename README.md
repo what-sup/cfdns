@@ -8,9 +8,17 @@
 
 配合crontab可以定时更新优选ip
 
+## 快速使用
+使用pip install -r requirements.txt快速安装依赖库
+
+修改config.yaml
+
+- MODE  1-取最新ip; 2-取速度最快ip; 3-取延迟最低ip
+
 ## 如何获取cloudflare api, 域名ID等信息
 
 [这里](https://github.com/XIU2/CloudflareSpeedTest/issues/40) 有详细教程，这里不详细展开
+
 
 ## credit
 [cf2dns](https://github.com/ddgth/cf2dns)
@@ -19,9 +27,3 @@
 
 [CloudFlare优质IP](https://stock.hostmonit.com/CloudFlareYes)
 
-## 快速使用
-使用pip install -r requirements.txt快速安装依赖库
-
-修改config.yaml
-
-- MODE  1-取最新ip; 2-取速度最快ip; 3-取延迟最低ip
