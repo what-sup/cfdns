@@ -12,33 +12,12 @@ urllib3.disable_warnings()
 KEY = "o1zrmHAF"
 TYPE = 'v4' #暂时只支持A记录
 
-'''
-MODE = 3 # 1-取最新ip; 2-取速度最快ip; 3-取延迟最低ip
-DOMAINS = {
-	"你的cloudflare api": {
-		"你要修改的域名ID1": {
-			"你要修改的域名解析记录ID1": {
-				"你的邮箱": "CM" # 网络类型： 移动-CM; 联通-CU; 电信-CT
-			},
-			"你要修改的域名解析记录ID2": {
-				"你的邮箱": "CU"
-			},
-			"你要修改的域名解析记录ID3": {
-				"你的邮箱": "CT"
-			}
-		},
-		"你要修改的域名ID2": {
-			#格式如上
-		}
-	}
-}
-'''
-
 with open("config.yaml", 'r',encoding='utf-8') as stream:
     try:
         config = yaml.load(stream.read(), Loader=yaml.FullLoader)
         DOMAINS = config['CONFIG']
         MODE = config['MODE']
+        print(DOMAINS)
     except Exception as e:
         print(e)
 
@@ -102,7 +81,7 @@ def get_by_latency(cfips, path):
 
 
 
-def put_cf(api, domain, dns, mail, net, ips):
+def put_cf(mail, api, domain, dns, net, region, cfips):
 	if MODE == 1:
 		ip = get_by_time(ips, net)
 	elif MODE == 2:
@@ -120,13 +99,13 @@ def put_cf(api, domain, dns, mail, net, ips):
 	print(net)
 	print(url)
 	print(requests.patch(url, headers = head, data = data).content)
-
+	
 
 def main():
 	if len(DOMAINS) > 0:
 		try:
 			cfips = get_ip()
-			print(cfips)
+			#print(cfips)
 			for mail, apis in DOMAINS.items():
 				for api, domains in apis.items():
 					for domain, dnss in domains.items():
