@@ -18,6 +18,7 @@ with open("config.yaml", 'r',encoding='utf-8') as stream:
         DOMAINS = config['CONFIG']
         MODE = config['MODE']
         print(DOMAINS)
+        print(MODE)
     except Exception as e:
         print(e)
 
@@ -32,6 +33,7 @@ def get_ip():
     except Exception as e:
         print(e)
         return None
+
 
 def get_by_time(cfips, path):
 	ippath = '$.info.' + path + "..ip"
@@ -79,10 +81,23 @@ def get_by_latency(cfips, path):
 			ret = ips[i]
 	return ret
 
-
+def get_ip_by_region(cfips, region):
+	ippath = '$.info.' + path + "..ip"
+	regionpath = '$.info.' + path + "..colo"
+	losspath = '$.info.' + path + "..loss"
+	ips = jsonpath.jsonpath(cfips, ippath)
+	regions = jsonpath.jsonpath(cfips, latencypath)
+	losses = jsonpath.jsonpath(cfips, losspath)
+	tmplatency = int(latencys[0])
+	ret = ips[0]
+	for i in range(len(ips)):
+		if tmplatency > latencys[i] and losses[i] == 0:
+			tmplatency = latencys[i]
+			ret = ips[i]
+	return ret
 
 def put_cf(mail, api, domain, dns, net, region, cfips):
-	ips = get_ip_by_region(ips, region)
+	#ips = get_ip_by_region(ips, region)
 	if MODE == 1:
 		ip = get_by_time(ips, net)
 	elif MODE == 2:
@@ -112,6 +127,7 @@ def main():
 					for domain, dnss in domains.items():
 						for dns, nets in dnss.items():
 							for net, region in nets.items():
+								print(mail, api, domain, dns, net, region, cfipsmail, api, domain, dns, net, region, cfips)
 								put_cf(mail, api, domain, dns, net, region, cfips)
 		except Exception as e:
 			print(e)
