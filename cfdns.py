@@ -64,7 +64,7 @@ def get_by_time(cfips, path):
 	tmptime = str(times[0])
 	ret = ips[0]
 	for i in range(len(ips)):
-		if tmptime > times[i] and loss[i] == 0:
+		if tmptime > times[i] and losses[i] == 0:
 			tmptime = times[i]
 			ret = ips[i]
 	return ret
@@ -79,7 +79,7 @@ def get_by_speed(cfips, path):
 	tmpspeed = int(speeds[0])
 	ret = ips[0]
 	for i in range(len(ips)):
-		if tmpspeed < speeds[i] and loss[i] == 0:
+		if tmpspeed < speeds[i] and losses[i] == 0:
 			tmpspeed = speeds[i]
 			ret = ips[i]
 
@@ -95,7 +95,7 @@ def get_by_latency(cfips, path):
 	tmplatency = int(latencys[0])
 	ret = ips[0]
 	for i in range(len(ips)):
-		if tmplatency > latencys[i] and loss[i] == 0:
+		if tmplatency > latencys[i] and losses[i] == 0:
 			tmplatency = latencys[i]
 			ret = ips[i]
 	return ret
