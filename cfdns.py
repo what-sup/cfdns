@@ -127,11 +127,12 @@ def main():
 		try:
 			cfips = get_ip()
 			print(cfips)
-			for api, domains in DOMAINS.items():
-				for domain, dnss in domains.items():
-					for dns, mails in dnss.items():
-						for mail, net in mails.items():
-							put_cf(api, domain, dns, mail, net, cfips)
+			for mail, apis in DOMAINS.items():
+				for api, domains in apis.items():
+					for domain, dnss in domains.items():
+						for dns, nets in dnss.items():
+							for net, region in nets.items():
+								put_cf(mail, api, domain, dns, net, region, cfips)
 		except Exception as e:
 			print(e)
 
