@@ -82,6 +82,7 @@ def get_by_latency(cfips, path):
 
 
 def put_cf(mail, api, domain, dns, net, region, cfips):
+	ips = get_ip_by_region(ips, region)
 	if MODE == 1:
 		ip = get_by_time(ips, net)
 	elif MODE == 2:

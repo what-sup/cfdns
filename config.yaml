@@ -1,16 +1,4 @@
 CONFIG:
-<<<<<<< Updated upstream
-  你的cloudflare api:
-    你要修改的域名ID1:
-      你要修改的域名解析记录ID1:
-        你的邮箱: CM
-      你要修改的域名解析记录ID2:
-        你的邮箱: CU
-      你要修改的域名解析记录ID3:
-        你的邮箱: CT
-    你要修改的域名ID2: 
-      格式如上
-=======
   你的邮箱:
     你的cloudflare api:
       你要修改的域名ID1:
@@ -24,7 +12,5 @@ CONFIG:
            CT:
             ALL
       你要修改的域名ID2: 
-         #在此处添加，格式如上，注意缩进        
->>>>>>> Stashed changes
-
+         #在此处添加，格式如上，注意缩进
 MODE: 3
