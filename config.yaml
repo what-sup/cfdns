@@ -4,6 +4,8 @@ CONFIG:
   your_domain_id: 
     your_dns_id: 
       CM: SEA
+      MODE: 1 #优先级高于全局MODE
+      force: 1 # 1:强制更改，若没有就从全部ip里改;0:如果没有符合条件的就不修改
     your_dns_id2:
       CU: SEA
     your_dns_id3:
