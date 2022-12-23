@@ -12,35 +12,15 @@ urllib3.disable_warnings()
 KEY = "o1zrmHAF"
 TYPE = 'v4' #暂时只支持A记录
 
-'''
-MODE = 3 # 1-取最新ip; 2-取速度最快ip; 3-取延迟最低ip
-DOMAINS = {
-	"你的cloudflare api": {
-		"你要修改的域名ID1": {
-			"你要修改的域名解析记录ID1": {
-				"你的邮箱": "CM" # 网络类型： 移动-CM; 联通-CU; 电信-CT
-			},
-			"你要修改的域名解析记录ID2": {
-				"你的邮箱": "CU"
-			},
-			"你要修改的域名解析记录ID3": {
-				"你的邮箱": "CT"
-			}
-		},
-		"你要修改的域名ID2": {
-			#格式如上
-		}
-	}
-}
-'''
-
 with open("config.yaml", 'r',encoding='utf-8') as stream:
-    try:
-        config = yaml.load(stream.read(), Loader=yaml.FullLoader)
-        DOMAINS = config['CONFIG']
-        MODE = config['MODE']
-    except Exception as e:
-        print(e)
+	config = yaml.load(stream.read(), Loader=yaml.FullLoader)
+	DOMAINS = config['CONFIG']
+	MODE = config['MODE']
+
+'''
+with open("ips.log", 'r',encoding='utf-8') as stream:
+	pass
+'''
 
 def get_ip():
     try:
@@ -54,10 +34,11 @@ def get_ip():
         print(e)
         return None
 
-def get_by_time(cfips, path):
-	ippath = '$.info.' + path + "..ip"
-	timepath = '$.info.' + path + "..time"
-	losspath = '$.info.' + path + "..loss"
+
+def get_by_time(cfips):
+	ippath = "$..ip"
+	timepath = "$..time"
+	losspath = "$..loss"
 	ips = jsonpath.jsonpath(cfips, ippath)
 	times = jsonpath.jsonpath(cfips, timepath)
 	losses = jsonpath.jsonpath(cfips, losspath)
@@ -69,10 +50,10 @@ def get_by_time(cfips, path):
 			ret = ips[i]
 	return ret
 
-def get_by_speed(cfips, path):
-	ippath = '$.info.' + path + "..ip"
-	speedpath = '$.info.' + path + "..speed"
-	losspath = '$.info.' + path + "..loss"
+def get_by_speed(cfips):
+	ippath = "$..ip"
+	speedpath = "$..speed"
+	losspath = "$..loss"
 	ips = jsonpath.jsonpath(cfips, ippath)
 	speeds = jsonpath.jsonpath(cfips, speedpath)
 	losses = jsonpath.jsonpath(cfips, losspath)
@@ -85,10 +66,10 @@ def get_by_speed(cfips, path):
 
 	return ret
 
-def get_by_latency(cfips, path):
-	ippath = '$.info.' + path + "..ip"
-	latencypath = '$.info.' + path + "..latency"
-	losspath = '$.info.' + path + "..loss"
+def get_by_latency(cfips):
+	ippath = "$..ip"
+	latencypath = "$..latency"
+	losspath = "$..loss"
 	ips = jsonpath.jsonpath(cfips, ippath)
 	latencys = jsonpath.jsonpath(cfips, latencypath)
 	losses = jsonpath.jsonpath(cfips, losspath)
@@ -100,15 +81,36 @@ def get_by_latency(cfips, path):
 			ret = ips[i]
 	return ret
 
+def get_ip_by_region(cfips, net, region):
+	ippath = '$.info.' + net + "..ip"
+	regionpath = '$.info.' + net + "..colo"
+	tmppath = '$.info.' + net + ".*"
+#	print(cfips)
+	ips = jsonpath.jsonpath(cfips, ippath)
+	regions = jsonpath.jsonpath(cfips, regionpath)
+	tmpips = jsonpath.jsonpath(cfips, tmppath)
+#	print(tmpips)
+	ret = []
+#	print(type(ret))
+	cnt = 0
+	for i in range(len(ips)):
+		if regions[i] == region:
+			ret.append(tmpips[i])
+			cnt += 1
+	return ret
 
-
-def put_cf(api, domain, dns, mail, net, ips):
+def put_cf(mail, api, domain, dns, net, region, cfips):
+	ips = get_ip_by_region(cfips, net, region)
+	print(ips)
+	if ips == []:
+		ips = cfips
+#	ips = cfips
 	if MODE == 1:
-		ip = get_by_time(ips, net)
+		ip = get_by_time(ips)
 	elif MODE == 2:
-		ip = get_by_speed(ips, net)
+		ip = get_by_speed(ips)
 	elif MODE == 3:
-		ip = get_by_latency(ips, net)
+		ip = get_by_latency(ips)
 	url = "https://api.cloudflare.com/client/v4/zones/" + domain + "/dns_records/" + dns
 	head = {
 		"Content-Type": "application/json",
@@ -120,21 +122,31 @@ def put_cf(api, domain, dns, mail, net, ips):
 	print(net)
 	print(url)
 	print(requests.patch(url, headers = head, data = data).content)
+	
 
+def main():	
+	    	
+	cfips = get_ip()
+	print(cfips)
+	#write_to_file
+	mail = DOMAINS['your_email']
+	api = DOMAINS['api']
+	DOMAINS.pop('your_email')
+	DOMAINS.pop('api')
+	i = iter(DOMAINS)
 
-def main():
-	if len(DOMAINS) > 0:
-		try:
-			cfips = get_ip()
-			print(cfips)
-			for mail, apis in DOMAINS.items():
-				for api, domains in apis.items():
-					for domain, dnss in domains.items():
-						for dns, nets in dnss.items():
-							for net, region in nets.items():
-								put_cf(mail, api, domain, dns, net, region, cfips)
-		except Exception as e:
-			print(e)
+	for each_domain in i:
+		domain = each_domain
+		dnses = DOMAINS[domain]
+		for dns in dnses:
+			nets = dnses[dns]
+			for net in nets:
+				regions = nets[net]
+				print(regions)
+				put_cf(mail, api, domain, dns, net, regions, cfips)
+
+	
+
 
 if __name__ == '__main__':
 	main()
