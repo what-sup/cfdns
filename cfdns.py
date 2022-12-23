@@ -13,9 +13,14 @@ KEY = "o1zrmHAF"
 TYPE = 'v4' #暂时只支持A记录
 
 with open("config.yaml", 'r',encoding='utf-8') as stream:
-		config = yaml.load(stream.read(), Loader=yaml.FullLoader)
-		DOMAINS = config['CONFIG']
-		MODE = config['MODE']
+	config = yaml.load(stream.read(), Loader=yaml.FullLoader)
+	DOMAINS = config['CONFIG']
+	MODE = config['MODE']
+
+'''
+with open("ips.log", 'r',encoding='utf-8') as stream:
+	pass
+'''
 
 def get_ip():
     try:
@@ -30,10 +35,10 @@ def get_ip():
         return None
 
 
-def get_by_time(cfips, path):
-	ippath = '$.info.' + path + "..ip"
-	timepath = '$.info.' + path + "..time"
-	losspath = '$.info.' + path + "..loss"
+def get_by_time(cfips):
+	ippath = "$..ip"
+	timepath = "$..time"
+	losspath = "$..loss"
 	ips = jsonpath.jsonpath(cfips, ippath)
 	times = jsonpath.jsonpath(cfips, timepath)
 	losses = jsonpath.jsonpath(cfips, losspath)
@@ -45,10 +50,10 @@ def get_by_time(cfips, path):
 			ret = ips[i]
 	return ret
 
-def get_by_speed(cfips, path):
-	ippath = '$.info.' + path + "..ip"
-	speedpath = '$.info.' + path + "..speed"
-	losspath = '$.info.' + path + "..loss"
+def get_by_speed(cfips):
+	ippath = "$..ip"
+	speedpath = "$..speed"
+	losspath = "$..loss"
 	ips = jsonpath.jsonpath(cfips, ippath)
 	speeds = jsonpath.jsonpath(cfips, speedpath)
 	losses = jsonpath.jsonpath(cfips, losspath)
@@ -61,10 +66,10 @@ def get_by_speed(cfips, path):
 
 	return ret
 
-def get_by_latency(cfips, path):
-	ippath = '$.info.' + path + "..ip"
-	latencypath = '$.info.' + path + "..latency"
-	losspath = '$.info.' + path + "..loss"
+def get_by_latency(cfips):
+	ippath = "$..ip"
+	latencypath = "$..latency"
+	losspath = "$..loss"
 	ips = jsonpath.jsonpath(cfips, ippath)
 	latencys = jsonpath.jsonpath(cfips, latencypath)
 	losses = jsonpath.jsonpath(cfips, losspath)
@@ -76,29 +81,36 @@ def get_by_latency(cfips, path):
 			ret = ips[i]
 	return ret
 
-def get_ip_by_region(cfips, region):
-	ippath = '$.info.' + path + "..ip"
-	regionpath = '$.info.' + path + "..colo"
-	losspath = '$.info.' + path + "..loss"
+def get_ip_by_region(cfips, net, region):
+	ippath = '$.info.' + net + "..ip"
+	regionpath = '$.info.' + net + "..colo"
+	tmppath = '$.info.' + net + ".*"
+#	print(cfips)
 	ips = jsonpath.jsonpath(cfips, ippath)
-	regions = jsonpath.jsonpath(cfips, latencypath)
-	losses = jsonpath.jsonpath(cfips, losspath)
-	tmplatency = int(latencys[0])
-	ret = ips[0]
+	regions = jsonpath.jsonpath(cfips, regionpath)
+	tmpips = jsonpath.jsonpath(cfips, tmppath)
+#	print(tmpips)
+	ret = []
+#	print(type(ret))
+	cnt = 0
 	for i in range(len(ips)):
-		if tmplatency > latencys[i] and losses[i] == 0:
-			tmplatency = latencys[i]
-			ret = ips[i]
+		if regions[i] == region:
+			ret.append(tmpips[i])
+			cnt += 1
 	return ret
 
 def put_cf(mail, api, domain, dns, net, region, cfips):
-	#ips = get_ip_by_region(ips, region)
+	ips = get_ip_by_region(cfips, net, region)
+	print(ips)
+	if ips == []:
+		ips = cfips
+#	ips = cfips
 	if MODE == 1:
-		ip = get_by_time(ips, net)
+		ip = get_by_time(ips)
 	elif MODE == 2:
-		ip = get_by_speed(ips, net)
+		ip = get_by_speed(ips)
 	elif MODE == 3:
-		ip = get_by_latency(ips, net)
+		ip = get_by_latency(ips)
 	url = "https://api.cloudflare.com/client/v4/zones/" + domain + "/dns_records/" + dns
 	head = {
 		"Content-Type": "application/json",
@@ -115,6 +127,8 @@ def put_cf(mail, api, domain, dns, net, region, cfips):
 def main():	
 	    	
 	cfips = get_ip()
+	print(cfips)
+	#write_to_file
 	mail = DOMAINS['your_email']
 	api = DOMAINS['api']
 	DOMAINS.pop('your_email')
@@ -128,11 +142,10 @@ def main():
 			nets = dnses[dns]
 			for net in nets:
 				regions = nets[net]
-				for region in regions:
-					put_cf(mail, api, domain, dns, net, region, cfips)
+				print(regions)
+				put_cf(mail, api, domain, dns, net, regions, cfips)
+
 	
-
-
 
 
 if __name__ == '__main__':
