@@ -6,11 +6,15 @@ import traceback
 import jsonpath
 import requests
 import yaml
-urllib3.disable_warnings()
+from log import Logger
 
 # KEY可以从 https://shop.hostmonit.com 获取，或者使用以下免费授权
 KEY = "o1zrmHAF"
 TYPE = 'v4' #暂时只支持A记录
+FORCE = 0
+
+log_debug = Logger('cfdns.log', level='debug')
+urllib3.disable_warnings()
 
 with open("config.yaml", 'r',encoding='utf-8') as stream:
 	config = yaml.load(stream.read(), Loader=yaml.FullLoader)
@@ -85,23 +89,27 @@ def get_ip_by_region(cfips, net, region):
 	ippath = '$.info.' + net + "..ip"
 	regionpath = '$.info.' + net + "..colo"
 	tmppath = '$.info.' + net + ".*"
-#	print(cfips)
 	ips = jsonpath.jsonpath(cfips, ippath)
 	regions = jsonpath.jsonpath(cfips, regionpath)
 	tmpips = jsonpath.jsonpath(cfips, tmppath)
-#	print(tmpips)
+	if region == "ALL":
+		return tmpips
 	ret = []
-#	print(type(ret))
 	cnt = 0
 	for i in range(len(ips)):
 		if regions[i] == region:
 			ret.append(tmpips[i])
 			cnt += 1
+	if len(ret) == 0 and FORCE == 0:
+		ret = [-1]
 	return ret
 
 def put_cf(mail, api, domain, dns, net, region, cfips):
 	ips = get_ip_by_region(cfips, net, region)
-	print(ips)
+	log_debug.logger.info(ips)
+	if(ips == [-1]):
+		log_debug.logger.error("No ip found in " + region)
+		return
 	if ips == []:
 		ips = cfips
 #	ips = cfips
@@ -118,17 +126,16 @@ def put_cf(mail, api, domain, dns, net, region, cfips):
 		"X-Auth-Key": api
 	}
 	data = '{"content": "'+ ip + '"}'
-	print(ip)
-	print(net)
-	print(url)
-	print(requests.patch(url, headers = head, data = data).content)
+	log_debug.logger.info(ip)
+	log_debug.logger.info(net)
+	log_debug.logger.info(url)
+	log_debug.logger.info(requests.patch(url, headers = head, data = data).content)
 	
 
 def main():	
 	    	
 	cfips = get_ip()
-	print(cfips)
-	#write_to_file
+	log_debug.logger.info(cfips)
 	mail = DOMAINS['your_email']
 	api = DOMAINS['api']
 	DOMAINS.pop('your_email')
@@ -142,11 +149,8 @@ def main():
 			nets = dnses[dns]
 			for net in nets:
 				regions = nets[net]
-				print(regions)
+				log_debug.logger.info(regions)
 				put_cf(mail, api, domain, dns, net, regions, cfips)
-
-	
-
 
 if __name__ == '__main__':
 	main()
