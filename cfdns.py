@@ -92,6 +92,8 @@ def get_ip_by_region(cfips, net, region):
 	ips = jsonpath.jsonpath(cfips, ippath)
 	regions = jsonpath.jsonpath(cfips, regionpath)
 	tmpips = jsonpath.jsonpath(cfips, tmppath)
+	if region == "ALL":
+		return tmpips
 	ret = []
 	cnt = 0
 	for i in range(len(ips)):
