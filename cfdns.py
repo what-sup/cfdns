@@ -13,14 +13,9 @@ KEY = "o1zrmHAF"
 TYPE = 'v4' #暂时只支持A记录
 
 with open("config.yaml", 'r',encoding='utf-8') as stream:
-    try:
-        config = yaml.load(stream.read(), Loader=yaml.FullLoader)
-        DOMAINS = config['CONFIG']
-        MODE = config['MODE']
-        print(DOMAINS)
-        print(MODE)
-    except Exception as e:
-        print(e)
+		config = yaml.load(stream.read(), Loader=yaml.FullLoader)
+		DOMAINS = config['CONFIG']
+		MODE = config['MODE']
 
 def get_ip():
     try:
@@ -117,20 +112,28 @@ def put_cf(mail, api, domain, dns, net, region, cfips):
 	print(requests.patch(url, headers = head, data = data).content)
 	
 
-def main():
-	if len(DOMAINS) > 0:
-		try:
-			cfips = get_ip()
-			#print(cfips)
-			for mail, apis in DOMAINS.items():
-				for api, domains in apis.items():
-					for domain, dnss in domains.items():
-						for dns, nets in dnss.items():
-							for net, region in nets.items():
-								print(mail, api, domain, dns, net, region, cfipsmail, api, domain, dns, net, region, cfips)
-								put_cf(mail, api, domain, dns, net, region, cfips)
-		except Exception as e:
-			print(e)
+def main():	
+	    	
+	cfips = get_ip()
+	mail = DOMAINS['your_email']
+	api = DOMAINS['api']
+	DOMAINS.pop('your_email')
+	DOMAINS.pop('api')
+	i = iter(DOMAINS)
+
+	for each_domain in i:
+		domain = each_domain
+		dnses = DOMAINS[domain]
+		for dns in dnses:
+			nets = dnses[dns]
+			for net in nets:
+				regions = nets[net]
+				for region in regions:
+					put_cf(mail, api, domain, dns, net, region, cfips)
+	
+
+
+
 
 if __name__ == '__main__':
 	main()
