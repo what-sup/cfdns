@@ -1,13 +1,13 @@
 CONFIG:
-  你的邮箱: 
-    你的cloudflare api: 
-      你要修改的域名ID1: 
-        你要修改的域名解析记录ID1: 
+  - your_email:
+    api: your_cloudflare_api
+    your_domain_id:
+      your_dns_id:
            CM: HKG
-        你要修改的域名解析记录ID2:
+      your_dns_id2:
            CU: SEA
-        你要修改的域名解析记录ID3:
+      your_dns_id3:
            CT: ALL
-      你要修改的域名ID2: 
+    your_domain_id2: 
          #在此处添加，格式如上，注意缩进
 MODE: 3
