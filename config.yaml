@@ -1,5 +1,5 @@
 CONFIG:
-  - your_email:
+  your_email:
     api: your_cloudflare_api
     your_domain_id:
       your_dns_id:
