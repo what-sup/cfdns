@@ -11,6 +11,7 @@ urllib3.disable_warnings()
 # KEY可以从 https://shop.hostmonit.com 获取，或者使用以下免费授权
 KEY = "o1zrmHAF"
 TYPE = 'v4' #暂时只支持A记录
+FORCE = 0
 
 with open("config.yaml", 'r',encoding='utf-8') as stream:
 	config = yaml.load(stream.read(), Loader=yaml.FullLoader)
@@ -97,11 +98,16 @@ def get_ip_by_region(cfips, net, region):
 		if regions[i] == region:
 			ret.append(tmpips[i])
 			cnt += 1
+	if len(ret) == 0 and FORCE == 0:
+		ret = [-1]
 	return ret
 
 def put_cf(mail, api, domain, dns, net, region, cfips):
 	ips = get_ip_by_region(cfips, net, region)
 	print(ips)
+	if(ips == [-1]):
+		print("No ip found in " + region)
+		return
 	if ips == []:
 		ips = cfips
 #	ips = cfips
